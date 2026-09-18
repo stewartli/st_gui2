@@ -38,10 +38,23 @@ impl MyApp {
             checked: false,
         }
     }
+    // eframe = { version = "0.29", features = ["persistence"] }
+    // serde = { version = "1", features = ["derive"] }
+    /*
+    fn new1(cc: &eframe::CreationContext<'_>) -> Self {
+        if let Some(x) = cc.storage {
+            eframe::get_value(x, eframe::APP_KEY).unwrap()
+        } else {
+            Self::new(&cc.egui_ctx)
+        }
+    }
+    */
     pub fn sidebar(&mut self, ui: &mut egui::Ui) {
         egui::Panel::left("sidebar")
-            .exact_size(320.0)
+            // .exact_size(320.0)
             .resizable(true)
+            .default_size(320.0)
+            .size_range(180.0..=420.0)
             .frame(egui::Frame::new().fill(SIB_BG).inner_margin(20.0))
             .show(ui, |ui| {
                 // 1. Heading
@@ -103,6 +116,17 @@ impl MyApp {
                 //         println!("waha check box");
                 //     }
                 // });
+
+                // 5. Link
+                if ui.link("Document").clicked() {
+                    println!("thank you for link");
+                }
+
+                ui.hyperlink_to("google", "www.google.com");
+                ui.add(egui::github_link_file!(
+                    "https://github.com/stewartli/st_gui2/blob/main/src/job.rs",
+                    "Source code"
+                ));
             });
     }
     pub fn mainbar(&mut self, ui: &mut egui::Ui) {
@@ -112,7 +136,8 @@ impl MyApp {
                     if ui.button("Exit").clicked() {
                         ui.send_viewport_cmd(egui::ViewportCommand::Close);
                     }
-                })
+                });
+                egui::widgets::global_theme_preference_buttons(ui);
             });
         });
 
