@@ -8,4 +8,7 @@ impl eframe::App for job::MyApp {
         self.sidebar(ui);
         self.mainbar(ui);
     }
+    fn on_exit(&mut self) {
+        println!("my app => {}", self.message);
+    }
 }

@@ -4,6 +4,7 @@ use st_gui2::job;
 fn main() -> eframe::Result<()> {
     let native_options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
+            .with_resizable(true)
             .with_inner_size([1200.0, 750.0])
             .with_min_inner_size([900.0, 600.0]),
         ..Default::default()

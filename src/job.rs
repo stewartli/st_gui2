@@ -1,4 +1,4 @@
-use eframe::egui;
+use eframe::egui::{self, FontId, TextStyle};
 
 use crate::util;
 
@@ -6,8 +6,8 @@ const SIB_BG: egui::Color32 = egui::Color32::from_rgb(22, 22, 25);
 
 #[allow(unused)]
 pub struct MyApp {
-    status: i32,
-    message: Option<String>,
+    status: Vec<i32>,
+    pub message: String,
     checked: bool,
 }
 
@@ -22,10 +22,19 @@ impl MyApp {
             x.visuals.widgets.inactive.bg_fill = egui::Color32::from_rgb(35, 35, 45);
             x.visuals.widgets.active.bg_fill = egui::Color32::from_rgb(85, 55, 150);
             x.visuals.widgets.hovered.bg_fill = egui::Color32::from_rgb(65, 45, 115);
+            // x.text_styles.insert(
+            //     TextStyle::Heading,
+            //     FontId::new(20.0, egui::FontFamily::Monospace),
+            // );
+            x.text_styles.insert(
+                TextStyle::Body,
+                FontId::new(12.0, egui::FontFamily::Monospace),
+            );
         });
+
         Self {
-            status: 0,
-            message: None,
+            status: vec![1, 2, 3, 4],
+            message: String::new(),
             checked: false,
         }
     }
@@ -96,10 +105,57 @@ impl MyApp {
                 // });
             });
     }
-    pub fn mainbar(&self, ui: &mut egui::Ui) {
+    pub fn mainbar(&mut self, ui: &mut egui::Ui) {
+        egui::Panel::top("menu bar").show(ui, |ui| {
+            egui::menu::MenuBar::new().ui(ui, |ui| {
+                ui.menu_button("File", |ui| {
+                    if ui.button("Exit").clicked() {
+                        ui.send_viewport_cmd(egui::ViewportCommand::Close);
+                    }
+                })
+            });
+        });
+
         egui::CentralPanel::default().show(ui, |ui| {
-            ui.label("hello");
-            // 1. ScrollArea
+            // 1. Collapsing
+            ui.collapsing("News", |ui| {
+                ui.vertical_centered_justified(|ui| {
+                    ui.label("name");
+                    ui.text_edit_singleline(&mut self.message);
+                })
+            });
+
+            // 2. ComboBox
+            let choice = ["test1", "test2", "test3"];
+            egui::ComboBox::from_label("Select job")
+                .selected_text("pick some")
+                .show_ui(ui, |ui| {
+                    for (i, x) in choice.iter().enumerate() {
+                        if ui
+                            .selectable_value(&mut Some(0), Some(i), choice[0])
+                            .clicked()
+                        {
+                            println!("{i}, {x}");
+                        }
+                    }
+                });
+
+            // 2.1 Tab
+            let mut pick = false;
+            ui.horizontal(|ui| {
+                pick |= ui.selectable_value(&mut self.status[0], 1, "mas").changed();
+                pick |= ui.selectable_value(&mut self.status[0], 2, "stx").changed();
+            });
+
+            if pick {
+                match self.status[0] {
+                    1 => println!("do mas job"),
+                    2 => println!("do sgx job"),
+                    _ => println!("do other job"),
+                }
+            }
+
+            // 3. ScrollArea
             egui::ScrollArea::vertical()
                 .id_salt("view scroll")
                 .auto_shrink([false, false])
@@ -107,7 +163,7 @@ impl MyApp {
                     ui.label("R scripts");
                     ui.add_space(20.0);
 
-                    // 2. Sense
+                    // 3.1. Sense
                     let res = egui::Frame::new()
                         .fill(egui::Color32::GRAY)
                         .corner_radius(egui::CornerRadius::same(10))
@@ -122,7 +178,7 @@ impl MyApp {
                         println!("do not touch me");
                     }
 
-                    // 3. Layout
+                    // 3.2 Layout
                     ui.add_space(20.0);
                     ui.horizontal(|ui| {
                         ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
@@ -132,7 +188,7 @@ impl MyApp {
                         })
                     });
 
-                    // 4. TextEdit
+                    // 3.3 TextEdit
                     ui.add_space(20.0);
                     let mut buf1 = String::new();
                     let txt = ui.add_sized(
@@ -148,7 +204,7 @@ impl MyApp {
                         println!("typed => {}", buf1);
                     }
 
-                    // 5. Layout
+                    // 3.4 Layout
                     ui.allocate_ui_with_layout(
                         egui::vec2(ui.available_width(), ui.available_height()),
                         egui::Layout::top_down(egui::Align::Min),
