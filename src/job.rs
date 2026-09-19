@@ -1,4 +1,4 @@
-use eframe::egui::{self, FontId, TextStyle};
+use eframe::egui;
 
 use crate::util;
 
@@ -14,8 +14,29 @@ pub struct MyApp {
 impl MyApp {
     pub fn new(ctx: &egui::Context) -> Self {
         // reset theme
+        ctx.set_visuals(egui::Visuals::dark());
+        // reset visuals
         ctx.request_repaint_after_secs(100.0);
         ctx.set_visuals(egui::Visuals::dark());
+        // reset font
+        let mut myfont = egui::FontDefinitions::default();
+        myfont.font_data.insert(
+            "my_font".to_owned(),
+            egui::FontData::from_static(include_bytes!("../asset/LavishlyYours-Regular.ttf"))
+                .into(),
+        );
+        myfont
+            .families
+            .entry(egui::FontFamily::Proportional)
+            .or_default()
+            .insert(0, "my_font".to_owned());
+        myfont
+            .families
+            .entry(egui::FontFamily::Monospace)
+            .or_default()
+            .push("my_font".to_owned());
+        ctx.set_fonts(myfont);
+        // reset style
         ctx.all_styles_mut(|x| {
             x.spacing.item_spacing = egui::vec2(10.0, 10.0);
             x.spacing.button_padding = egui::vec2(14.0, 8.0);
@@ -27,8 +48,8 @@ impl MyApp {
             //     FontId::new(20.0, egui::FontFamily::Monospace),
             // );
             x.text_styles.insert(
-                TextStyle::Body,
-                FontId::new(12.0, egui::FontFamily::Monospace),
+                egui::TextStyle::Body,
+                egui::FontId::new(12.0, egui::FontFamily::Monospace),
             );
         });
 
@@ -38,9 +59,9 @@ impl MyApp {
             checked: false,
         }
     }
+    /*
     // eframe = { version = "0.29", features = ["persistence"] }
     // serde = { version = "1", features = ["derive"] }
-    /*
     fn new1(cc: &eframe::CreationContext<'_>) -> Self {
         if let Some(x) = cc.storage {
             eframe::get_value(x, eframe::APP_KEY).unwrap()
@@ -81,8 +102,16 @@ impl MyApp {
                     println!("add your tool here");
                 }
 
+                ui.button("Open file")
+                    .on_hover_text("rfd")
+                    .clicked()
+                    .then(|| println!("open rfd"));
+
                 // 3. TextEdit
                 ui.separator();
+                ui.add(egui::Separator::default().spacing(20.0));
+                ui.style_mut().visuals.hyperlink_color = egui::Color32::CYAN;
+
                 let mut buf = String::new();
                 ui.horizontal(|ui| {
                     ui.label("Search");
@@ -130,6 +159,7 @@ impl MyApp {
             });
     }
     pub fn mainbar(&mut self, ui: &mut egui::Ui) {
+        // global theme + egui command
         egui::Panel::top("menu bar").show(ui, |ui| {
             egui::menu::MenuBar::new().ui(ui, |ui| {
                 ui.menu_button("File", |ui| {
@@ -199,21 +229,20 @@ impl MyApp {
                             ui.add_space(20.0);
                         })
                         .response;
+
                     if res.interact(egui::Sense::click()).clicked() {
                         println!("do not touch me");
                     }
 
-                    // 3.2 Layout
-                    ui.add_space(20.0);
-                    ui.horizontal(|ui| {
-                        ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
-                            ui.label("btn1");
-                            ui.label("btn2");
-                            ui.label("btn3");
-                        })
-                    });
+                    // Sense::drag
+                    ui.allocate_exact_size(egui::vec2(20.0, 20.0), egui::Sense::click_and_drag());
 
-                    // 3.3 TextEdit
+                    let panel_rect = ui.allocate_rect(ui.min_rect(), egui::Sense::drag());
+                    if panel_rect.hovered() || panel_rect.hovered() || panel_rect.dragged() {
+                        println!("hover or drag area");
+                    }
+
+                    // 3.2 TextEdit
                     ui.add_space(20.0);
                     let mut buf1 = String::new();
                     let txt = ui.add_sized(
@@ -229,7 +258,16 @@ impl MyApp {
                         println!("typed => {}", buf1);
                     }
 
-                    // 3.4 Layout
+                    // 3.3 Layout
+                    ui.add_space(20.0);
+                    ui.horizontal(|ui| {
+                        ui.with_layout(egui::Layout::left_to_right(egui::Align::Center), |ui| {
+                            ui.label("btn1");
+                            ui.label("btn2");
+                            ui.label("btn3");
+                        })
+                    });
+
                     ui.allocate_ui_with_layout(
                         egui::vec2(ui.available_width(), ui.available_height()),
                         egui::Layout::top_down(egui::Align::Min),
@@ -244,8 +282,40 @@ impl MyApp {
                                     ui.label("again");
                                 })
                         },
-                    )
+                    );
+
+                    // 3.4 painter
+                    ui.painter().circle_stroke(
+                        ui.available_rect_before_wrap().center(),
+                        12.0,
+                        egui::Stroke::new(2.0, egui::Color32::from_rgb(255, 0, 0)),
+                    );
+
+                    let (resp, pat) =
+                        ui.allocate_painter(egui::vec2(120.0, 120.0), egui::Sense::hover());
+                    let center = resp.rect.center();
+                    pat.circle_stroke(center, 50.0, egui::Stroke::new(2.0, egui::Color32::WHITE));
+
+                    // Window
+                    egui::Window::new("help me")
+                        .anchor(egui::Align2::CENTER_BOTTOM, [0.0, 0.0])
+                        .collapsible(true)
+                        .resizable(true)
+                        .movable(true)
+                        .show(ui, |ui| {
+                            if ui.button("win-btn").clicked() {
+                                println!("win-btn clicked");
+                            }
+                        })
                 })
         });
+    }
+    pub fn footbar(&self, ui: &mut egui::Ui) {
+        egui::Panel::bottom("foot bar")
+            .resizable(false)
+            .min_size(0.0)
+            .show(ui, |ui| {
+                ui.label("CA Analytics - Audit Data Analytics");
+            });
     }
 }

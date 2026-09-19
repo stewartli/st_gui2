@@ -7,9 +7,15 @@ use st_gui2::job;
 fn main() -> eframe::Result<()> {
     let native_options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
+            // wsl2 issue (vs native windows os)
             .with_icon(
                 eframe::icon_data::from_png_bytes(&include_bytes!("../asset/1.png")[..]).unwrap(),
             )
+            // removve window frame and drag
+            .with_decorations(false)
+            .with_transparent(true)
+            .with_title("hello world")
+            // modify window size
             .with_resizable(true)
             .with_inner_size([1200.0, 750.0])
             .with_min_inner_size([900.0, 600.0]),
