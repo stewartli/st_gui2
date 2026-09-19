@@ -1,6 +1,7 @@
 **Usage**   
 ![outcome](./asset/1.png)   
 
+
 **Sys deps**    
 ```bash
 for pkg in libgtk-3-0 libgtk-3-dev\ 
@@ -9,6 +10,12 @@ for pkg in libgtk-3-0 libgtk-3-dev\
   dpkg -s "$pkg" &>/dev/null && echo "OK      $pkg" || echo "MISSING $pkg"
 done
 ```
+
+
+**Known issues**    
+1. Wayland on wsl2 is not stable. run it via X11. `WAYLAND_DISPLAY= cargo run --example demo1`    
+2. Windows setup is better than wsl2 to develop GUI apps.    
+
 
 **Learning materials**  
 [egui: note](https://www.youtube.com/watch?v=hGsqR3DK5Do)  
