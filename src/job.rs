@@ -13,12 +13,14 @@ pub struct MyApp {
 
 impl MyApp {
     pub fn new(ctx: &egui::Context) -> Self {
-        // reset theme
+        // 1. reset theme
         ctx.set_visuals(egui::Visuals::dark());
-        // reset visuals
+        // 2. reset visuals
+        /*
         ctx.request_repaint_after_secs(100.0);
-        ctx.set_visuals(egui::Visuals::dark());
-        // reset font
+        ctx.set_debug_on_hover(true);
+        */
+        // 3. reset font
         let mut myfont = egui::FontDefinitions::default();
         myfont.font_data.insert(
             "my_font".to_owned(),
@@ -36,7 +38,7 @@ impl MyApp {
             .or_default()
             .push("my_font".to_owned());
         ctx.set_fonts(myfont);
-        // reset style
+        // 4. reset style
         ctx.all_styles_mut(|x| {
             x.spacing.item_spacing = egui::vec2(10.0, 10.0);
             x.spacing.button_padding = egui::vec2(14.0, 8.0);
@@ -296,12 +298,13 @@ impl MyApp {
                     let center = resp.rect.center();
                     pat.circle_stroke(center, 50.0, egui::Stroke::new(2.0, egui::Color32::WHITE));
 
-                    // Window
+                    // 3.5 Window
                     egui::Window::new("help me")
                         .anchor(egui::Align2::CENTER_BOTTOM, [0.0, 0.0])
                         .collapsible(true)
                         .resizable(true)
                         .movable(true)
+                        .open(&mut self.message.is_empty())
                         .show(ui, |ui| {
                             if ui.button("win-btn").clicked() {
                                 println!("win-btn clicked");
