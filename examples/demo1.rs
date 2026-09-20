@@ -20,6 +20,7 @@ impl MyApp {
     fn show(&self, ui: &egui::Ui) {
         let ctx = ui.ctx().clone();
         // ctx.egui_wants_keyboard_input();
+        // egui::Visuals::dark().panel_fill;
         if self.checked {
             ctx.set_visuals(egui::Visuals::dark());
         } else {
@@ -97,7 +98,11 @@ impl eframe::App for MyApp {
                 }
             });
 
-            // 6.
+            // 6. scope
+            ui.scope(|ui| {
+                ui.visuals_mut().override_text_color = Some(egui::Color32::RED);
+                ui.label("become red now");
+            })
         });
 
         self.show(ui);
