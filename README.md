@@ -19,6 +19,7 @@ done
 
 **Learning materials**  
 [egui: note](https://www.youtube.com/watch?v=hGsqR3DK5Do)  
+[egui: picker](https://www.youtube.com/watch?v=s8YYSCgLhKI)         
 [egui: img](https://www.youtube.com/watch?v=m4iwY8di9DA)   
 [egui: svg](https://www.youtube.com/watch?v=DJVKNRN5avo)   
 [egui: game](https://www.youtube.com/watch?v=7Cf1oqOi1js&t=497s)   
